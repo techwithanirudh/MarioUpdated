@@ -221,7 +221,6 @@ scene("start", () => {
     origin("center"),
     color(255, 255, 255),
   ]);
-  document.write('bnu')
 
   keyRelease("enter", () => {
     go("game");
