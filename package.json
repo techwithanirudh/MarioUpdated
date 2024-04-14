@@ -11,13 +11,17 @@
   "description": "",
   "version": "1.0.0",
   "main": "index.js",
-  "devDependencies": {},
   "scripts": {
-	"start": "node index.js",
-	"build": "node build.js",
+    "start": "node index.js",
+    "build": "node build.js",
+    "dev": "nodemon",
+    "serve": "serve -s dist",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
   "author": "",
-  "license": "AGPL-3.0-only"
+  "license": "AGPL-3.0-only",
+  "devDependencies": {
+    "nodemon": "^3.1.0"
+  }
 }
