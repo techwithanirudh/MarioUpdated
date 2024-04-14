@@ -1,73 +1,74 @@
-const fs = require("fs");
-const esbuild = require("esbuild");
+const fs = require('fs');
+const esbuild = require('esbuild');
+const path = require('path');
 
-let err = null;
+// Helper function to copy directories recursively
+function copyDir(src, dest) {
+    fs.mkdirSync(dest, { recursive: true });
+    let entries = fs.readdirSync(src, { withFileTypes: true });
 
+    for (let entry of entries) {
+        let srcPath = path.join(src, entry.name);
+        let destPath = path.join(dest, entry.name);
+
+        entry.isDirectory() ? copyDir(srcPath, destPath) : fs.copyFileSync(srcPath, destPath);
+    }
+}
+
+// Main build function
 function buildGame() {
-	const template = fs.readFileSync("template.html", "utf-8");
-	let code = "";
+    // Read template file
+    const template = fs.readFileSync('template.html', 'utf-8');
+    let code = `<script src="/dist/helper.js"></script>\n<script src="/dist/game.js"></script>\n`;
 
-	code += `<script src="/dist/helper.js"></script>\n`;
-	code += `<script src="/dist/game.js"></script>\n`;
+    // Configuration for building scripts
+    const buildConfig = [
+        {
+            entryPoints: ['code/main.js'],
+            outfile: 'dist/game.js'
+        },
+        {
+            entryPoints: ['helper.ts'],
+            outfile: 'dist/helper.js'
+        }
+    ];
 
-	try {
-		esbuild.buildSync({
-			bundle: true,
-			sourcemap: true,
-			target: "es6",
-			keepNames: true,
-			logLevel: "silent",
-			entryPoints: ["code/main.js"],
-			outfile: "dist/game.js",
-		});
+    try {
+        // Run build for each config
+        buildConfig.forEach(config => {
+            esbuild.buildSync({
+                ...config,
+                bundle: true,
+                sourcemap: true,
+                target: 'es6',
+                keepNames: true,
+                logLevel: 'silent'
+            });
+        });
 
-		esbuild.buildSync({
-			bundle: true,
-			sourcemap: true,
-			target: "es6",
-			keepNames: true,
-			entryPoints: ["helper.ts"],
-			outfile: "dist/helper.js",
-		});
+        // Write the modified template to the dist folder
+        fs.writeFileSync('dist/index.html', template.replace('{{kaboom}}', code));
 
-	} catch (e) {
-		const loc = e.errors[0].location;
-		err = {
-			msg: e.errors[0].text,
-			stack: [
-				{
-					line: loc.line,
-					col: loc.column,
-					file: loc.file,
-				},
-			],
-		};
-		let msg = "";
-		msg += "<pre>";
-		msg += `ERROR: ${err.msg}\n`;
-		if (err.stack) {
-			err.stack.forEach((trace) => {
-				msg += `    -> ${trace.file}:${trace.line}:${trace.col}\n`;
-			});
-		}
-		msg += "</pre>";
-		fs.writeFileSync("dist/index.html", msg);
-		return;
-	}
+        // Copy assets
+        copyDir('sprites', 'dist/sprites');
+        copyDir('sounds', 'dist/sounds');
 
-	fs.writeFileSync("dist/index.html", template.replace("{{kaboom}}", code));
+        console.log('The build is successful!');
+    } catch (error) {
+        // Handle and log errors
+        const loc = error.errors[0].location;
+        const errorMsg = `<pre>ERROR: ${error.errors[0].text}\n` +
+                         `    -> ${loc.file}:${loc.line}:${loc.column}\n</pre>`;
+        fs.writeFileSync('dist/index.html', errorMsg);
 
+        console.error('ERROR:', error.errors[0].text);
+        if (error.errors[0].stack) {
+            error.errors[0].stack.forEach(trace => {
+                console.error(`    -> ${trace.file}:${trace.line}:${trace.col}`);
+            });
+        }
+    }
 }
 
-buildGame()
-if (err) {
-	console.log("");
-	console.error(red(`ERROR: ${err.msg}`));
-	if (err.stack) {
-		err.stack.forEach((trace) => {
-			console.error(`    -> ${trace.file}:${trace.line}:${trace.col}`);
-		});
-	}
-} else {
-	console.log('The build is successful!')
-}
+// Run build
+buildGame();
