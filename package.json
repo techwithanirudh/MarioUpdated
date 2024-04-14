@@ -1,11 +1,22 @@
 {
-	"name": "kaboom-env",
-	"dependencies": {
-		"chokidar": "^3.5.2",
-		"esbuild": "^0.12.19",
-		"express": "^4.17.1",
-		"kaboom": "2000.1.6",
-		"stacktrace-js": "^2.0.2",
-		"ws": "^8.2.0"
-	}
+  "name": "mario-updates",
+  "dependencies": {
+    "chokidar": "^3.5.2",
+    "esbuild": "^0.12.19",
+    "express": "^4.17.1",
+    "kaboom": "2000.1.6",
+    "stacktrace-js": "^2.0.2",
+    "ws": "^8.2.0"
+  },
+  "description": "",
+  "version": "1.0.0",
+  "main": "index.js",
+  "devDependencies": {},
+  "scripts": {
+	"start": "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "AGPL-3.0-only"
 }
