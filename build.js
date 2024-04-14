@@ -19,7 +19,7 @@ function copyDir(src, dest) {
 function buildGame() {
     // Read template file
     const template = fs.readFileSync('template.html', 'utf-8');
-    let code = `<script src="/dist/helper.js"></script>\n<script src="/dist/game.js"></script>\n`;
+    let code = `<script src="/helper.js"></script>\n<script src="/game.js"></script>\n`;
 
     // Configuration for building scripts
     const buildConfig = [
